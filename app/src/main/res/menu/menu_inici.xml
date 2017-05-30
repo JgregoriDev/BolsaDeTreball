@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.lpc.bolsadetreball.Inici">
+    <item
+        android:id="@+id/Inici"
+        android:orderInCategory="100"
+        android:title="@string/Inici"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/Llista_Ofertes"
+        android:orderInCategory="100"
+        android:title="@string/LlistaDeOfertes"
+        app:showAsAction="never" />
+    <!--<item
+        android:id="@+id/Insertar"
+        android:orderInCategory="100"
+        android:title="@string/Insertar"
+        app:showAsAction="never" />-->
+</menu>

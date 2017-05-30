@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "634441375285",
+    "firebase_url": "https://projectefinal-dea68.firebaseio.com",
+    "project_id": "projectefinal-dea68",
+    "storage_bucket": "projectefinal-dea68.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634441375285:android:7e0ed8c6f0291c42",
+        "android_client_info": {
+          "package_name": "com.example.lpc.bolsadetreball"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "634441375285-8kf1u5bia9853ra0rfff9ndrhcfaba8t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lpc.bolsadetreball",
+            "certificate_hash": "f5b10645650f7f9bafd59c4eba83cd57ea47e127"
+          }
+        },
+        {
+          "client_id": "634441375285-goc33c8dbm4ltdg2gfrhuree2aoaq3c7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKsftvJxsebjfDVRjHu-OT30_abBCSBzk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "634441375285-goc33c8dbm4ltdg2gfrhuree2aoaq3c7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
