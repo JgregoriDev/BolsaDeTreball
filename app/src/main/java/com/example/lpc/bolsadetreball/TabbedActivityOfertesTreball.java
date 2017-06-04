@@ -18,11 +18,10 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,24 +48,10 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
     public static String Telefon;
     public static String Email;
     public static ArrayList<OfertesTreball> ofertesTreballs = null;
-    public int pos = -1;
-    static int codi = -1;
-
-
-  /*  @Override
-    protected void onPause() {
-        super.onPause();
-        ofertesTreballs.clear();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Bundle bundle = getIntent().getExtras();
-        if(ofertesTreballs.isEmpty()){
-            ofertesTreballs = bundle.getParcelableArrayList("ArrayOfertesTreball");
-        }
-    }*/
+    public static int pos = -1;
+    static int codi = 0;
+//    public static int[] posi = new int[3];
+    private Button b_share;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,15 +65,18 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
 
         } else {
             Log.d("Jack", "Numero  d'elements " + ofertesTreballs.size());
-            ofertesTreballs=null;
+            ofertesTreballs = null;
             ofertesTreballs = bundle.getParcelableArrayList("ArrayOfertesTreball");
         }
         if (pos == -1) {
             pos = bundle.getInt("posicio");
-            bundle=null;
+            Log.d("Jack","Tabbed Codi"+pos);
+//            bundle = null;
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        b_share = (Button) findViewById(R.id.share);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -97,64 +85,52 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(pos);
-        FragmentManager fm = getSupportFragmentManager();
 
-        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
-            fm.popBackStack();
-        }
+        b_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, "Oferta de Trabajo " + "Codi:" + ofertesTreballs.get(pos).getCodi() + "\n" + " Nombre: " + ofertesTreballs.get(pos).getNom());
+                startActivity(Intent.createChooser(intent, "Share with"));
 
+            }
+        });
+/*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-/*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-*/
                 BorrarOfertaTreball();
             }
         });
-        if (pos != -1)
-            pos = -1;
-//        ofertesTreballs.clear();
+*/
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-//        ofertesTreballs=null;
-        finish();
+        /*i=0;*/
+        if (pos != -1)
+            pos = -1;
     }
 
     private void BorrarOfertaTreball() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        codi++;
         builder.setTitle("Confirmar");
         builder.setMessage("Estàs segur de borrar l'informació de la oferta de treball " + codi + "?");
-        if(ofertesTreballs.size()<=1){
-
-        }
         builder.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
-                // Do nothing but close the dialog
-                if (codi != -1) {
-                    SQLiteHelper sqLiteHelper = new SQLiteHelper(getApplicationContext());
+                SQLiteHelper sqLiteHelper = new SQLiteHelper(getApplicationContext());
+                sqLiteHelper.BorrarRegistre(codi);
+                dialog.dismiss();
+                Toast.makeText(getApplicationContext(), "Has borrado la notificación correspondiente", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(TabbedActivityOfertesTreball.this, LlistaOfertesActivity.class);
+                intent.putExtra("Activity", "DadesOfertaActivity");
+                startActivity(intent);
 
-                    sqLiteHelper.BorrarRegistre(codi);
-                    dialog.dismiss();
-                    if (codi != -1) {
-                        codi = 0;
-                    }
-                    Toast.makeText(getApplicationContext(), "Has borrado la notificación correspondiente", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(TabbedActivityOfertesTreball.this, LlistaOfertesActivity.class);
-                    intent.putExtra("Activity", "DadesOfertaActivity");
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getApplicationContext(), "No has podido borrar el registro", Toast.LENGTH_SHORT).show();
-
-
-                }
             }
         });
 
@@ -162,8 +138,6 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
-                // Do nothing
                 dialog.dismiss();
             }
         });
@@ -172,41 +146,13 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
         alert.show();
     }
 
-/*
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_tabbed_activity_ofertes_treball, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-*/
-
 
     /**
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
         private static final String ARG_SECTION_NUMBER = "section_number";
+
 
         public PlaceholderFragment() {
         }
@@ -215,10 +161,19 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
          * Returns a new instance of this fragment for the given section
          * number.
          */
+        public static int sectNumber = 0;
+
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            /*int p = 0;
+            if (i == 1) {
+                pos = sectionNumber;
+                p = ofertesTreballs.get(pos).getCodi();
+            }*/
+//            posi[i]=ofertesTreballs.get(sectionNumber).getCodi();
+//            Log.d("Proba", "" + p);
             fragment.setArguments(args);
             return fragment;
         }
@@ -240,8 +195,8 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
             TextView tv_data = (TextView) rootView.findViewById(R.id.tv_data);
             TextView tv_question = (TextView) rootView.findViewById(R.id.tv_question);
             TextView tv_question1 = (TextView) rootView.findViewById(R.id.tv_question1);
-            codi = ofertesTreballs.get(id).getCodi();
-            Log.d("Codi",""+codi);
+            int cod;
+            cod = 0;
             String nom = ofertesTreballs.get(id).getNom();
             String Poblacio = ofertesTreballs.get(id).getPoblacio();
             tv_question.append(" ");
@@ -262,10 +217,10 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
             String Cicle = ofertesTreballs.get(id).getCicle();
             final String Email = ofertesTreballs.get(id).getEmail();
             String Descripcio = ofertesTreballs.get(id).getDescripcio();
-//            tv_codi.setText("Codi: " + ofertesTreballs.get(id).getCodi());
-            tv_codi.setText("Codi: " + codi);
-
-            Log.d("Codi", "Codi " + codi + " Nom:" + nom);
+            codi = ofertesTreballs.get(id).getCodi();
+            tv_codi.setText("" + codi);
+            //Aconsegueix el codi de la oferta
+            Log.d("Codi", "" + cod);
 
             tv_nom.setText("Nom: " + nom);
             if (Telefon != null) {
@@ -285,7 +240,7 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
             }
 
             if (Poblacio != null) {
-                if (Telefon.equals("null")) {
+                if (Poblacio.equals("null")) {
                     tv_poblacio.setText("Població: La informació no està registrada");
                 } else {
                     tv_poblacio.setText("Població: " + Poblacio);
@@ -294,9 +249,9 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
             } else {
                 tv_poblacio.setText("Població:  La informació no està registrada");
             }
-            if (Telefon != null) {
-                if (Telefon.equals("null")) {
-                    tv_email.setText("Població: La informació no està registrada");
+            if (Email != null) {
+                if (Email.equals("null")) {
+                    tv_email.setText("E-mail: La informació no està registrada");
                 } else {
                     tv_email.setText("E-mail: " + Email);
                     tv_email.setOnClickListener(new View.OnClickListener() {
@@ -309,20 +264,19 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
 
                 }
             } else {
-                tv_email.setText("Població:  La informació no està registrada");
+                tv_email.setText("E-mail:  La informació no està registrada");
             }
             if (Descripcio != null) {
-                if (Descripcio.equals("null")) {
+                if (!Descripcio.equals("null")) {
                     tv_descripcio.setText("Descripcio: " + Descripcio);
                 } else {
-
-                    tv_descripcio.setText("Descripcio: " + Descripcio);
+                    tv_descripcio.setText("Descripcio: No s'ha deixat ningun registre");
                 }
             } else {
                 tv_descripcio.setText("Descripcio: No s'ha deixat ningun registre");
             }
             if (Cicle != null) {
-                if (Cicle.equals("null")) {
+                if (!Cicle.equals("null")) {
                     tv_cicle.setText("Cicle: " + Cicle);
                 } else {
 
@@ -332,11 +286,11 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
                 tv_cicle.setText("Cicle: " + Cicle);
             }
             if (Descripcio != null) {
-                if (Descripcio.equals("null")) {
+                if (!Descripcio.equals("null")) {
                     tv_descripcio.setText("Descripcio: " + Descripcio);
                 } else {
-
                     tv_descripcio.setText("Descripcio: No s'ha deixat ningun registre");
+
 //                    tv_descripcio.setTextSize();
                 }
             } else {
@@ -352,6 +306,7 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
 
     }
 
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -366,46 +321,30 @@ public class TabbedActivityOfertesTreball extends MenuActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return TabbedActivityOfertesTreball.PlaceholderFragment.newInstance(position - 1);
-//            return PlaceholderFragment.newInstance(position - 1);
+            int posicio = position - 1;
+
+            return TabbedActivityOfertesTreball.PlaceholderFragment.newInstance(posicio);
+//            return PlaceholderFragment.newInstance(position + 1);
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
+
             return ofertesTreballs.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-//            int n = 0;
-      /*     for (int i=ofertesTreballs.size()-1;i>=0;i++){
-               if (i == position) {
-                   n = i;
-                   n++;
-//                   return "SECTION " + n + " " + ofertesTreballs.get(i).getNom();
-                   return "" + ofertesTreballs.get(i).getNom();
-               }
-
-           }*/
             for (int i = ofertesTreballs.size() - 1; i >= 0; i--) {
                 if (i == position) {
-//                    n = i;
-//                    n++;
-//                   return "SECTION " + n + " " + ofertesTreballs.get(i).getNom();
                     return "" + ofertesTreballs.get(i).getNom();
                 }
 
             }
-
-            /* switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
+           /* for (int i=0;i<=ofertesTreballs.size();i++){
+                return "" + ofertesTreballs.get(i).getNom();
             }*/
+
             return null;
         }
     }

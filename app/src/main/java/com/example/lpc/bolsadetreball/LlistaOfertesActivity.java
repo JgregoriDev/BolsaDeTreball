@@ -1,8 +1,10 @@
 package com.example.lpc.bolsadetreball;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 
 import android.util.Log;
@@ -14,23 +16,17 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.example.lpc.bolsadetreball.Entitat.OfertesTreball;
 
 import java.util.ArrayList;
 
+
 public class LlistaOfertesActivity extends MenuActivity {
-    private ArrayList<OfertesTreball> llistaOfertes;
     private ListView listView;
     private SQLiteHelper sqLiteHelper;
     private SQLiteDatabase bd;
     private Button b_clear;
     private CheckBox cb_dam, cb_asix;
-    private int num;
 
     //    private ArrayList<OfertesTreball> llista;
     private ArrayList<String> llista;
@@ -40,20 +36,46 @@ public class LlistaOfertesActivity extends MenuActivity {
     Bundle bundle;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_llista);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle(R.string.title_activity_dades_oferta);
+        boolean cb_d = false, cb_a = false;
+        boolean dadesAplegades = false;
 
+        bundle = getIntent().getExtras();
+        if (bundle == null) {
+//          bundle=getIntent().getExtras();
+            Log.d("Bundle", "Bundle vacio");
+        } else {
+//            bundle=getIntent().getExtras();
+            String bundleContingut = bundle.getString("LlistaOfertesActivity");
+            if (bundleContingut.equals("LlistaOfertesActivity.class")) {
+                cb_a = bundle.getBoolean("cb_asix");
+                cb_d = bundle.getBoolean("cb_dam");
+                dadesAplegades = true;
+            }
+
+            Log.d("Bundle", "El Bundle no està buit");
+        }
 
         sqLiteHelper = new SQLiteHelper(getApplicationContext());
         listView = (ListView) findViewById(R.id.listView);
         cb_dam = (CheckBox) findViewById(R.id.cb_dam);
         cb_asix = (CheckBox) findViewById(R.id.cb_asix);
         b_clear = (Button) findViewById(R.id.b_clear);
+        if (dadesAplegades) {
+            cb_dam.setChecked(cb_d);
+            cb_asix.setChecked(cb_a);
+            Log.d("Bundle", "dades Aplegades verdader");
+        } else {
+            Log.d("Bundle", "dades Aplegades falç");
+
+        }
+
 
 
         CondicioArray();
@@ -69,7 +91,6 @@ public class LlistaOfertesActivity extends MenuActivity {
             @Override
             public void onClick(View v) {
                 CondicioArray();
-//                CondicioArrayLlistaOfertes();
             }
         });
         cb_asix.setOnClickListener(new View.OnClickListener() {
@@ -80,82 +101,138 @@ public class LlistaOfertesActivity extends MenuActivity {
 //                CondicioArrayLlistaOfertes();
             }
         });
-        arrayOfertesTreballs = sqLiteHelper.cargarArrayList(condicio);
+//        arrayOfertesTreballs = sqLiteHelper.cargarArrayListOfertesTreball(condicio);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Toast.makeText(getApplicationContext(),""+position,Toast.LENGTH_SHORT).show();
-                //Obting el bloc de text del listview i la guarde en una variable
-                String valors = listView.getItemAtPosition(position).toString();
-                //Cree un array de String
-                String[] arrayValorsOt = new String[3];
-                //Almacene en el array anterior totes les linees amb bot de text
-                arrayValorsOt = valors.split("\n");
-                //Almacene la posició cero del array en un string
-                String codilletres = arrayValorsOt[0];
-                //Cree un array
-                String[] codill = new String[2];
-                //Y repartixc el codi per un :
-                codill = codilletres.split(":");
-                int codi = 0;
-                //Transforme el codi amb mode text i el transforme en un int
-                codi = Integer.parseInt(codill[1]);
 
-                arrayOfertesTreballs=sqLiteHelper.cargarArrayList(condicio);
+                arrayOfertesTreballs = sqLiteHelper.cargarArrayListOfertesTreball(condicio);
                 if (arrayOfertesTreballs != null) {
-                    Toast.makeText(getApplicationContext(), "Trobat", Toast.LENGTH_SHORT);
-                    /*Intent intent = new Intent(LlistaOfertesActivity.this, DadesOfertaActivity.class);
-                    intent.putExtra("Nom", listView.getItemAtPosition(position).toString());
-                    intent.putExtra("OfertesTreball", ot);*/
+
+//                    MostrarEnpantalla("Carrega de codi exitosa " + codi);
                     Intent intent = new Intent(LlistaOfertesActivity.this, TabbedActivityOfertesTreball.class);
-//                    CondicioArrayLlistaOfertes();
-//                    arrayOfertesTreballs = sqLiteHelper.cargarArrayList(condicio);
-                    Log.d("Jack", ""+position);
                     intent.putExtra("posicio", position);
-                    Log.d("Jack","Enviant arraylist amb tamany "+arrayOfertesTreballs.size());
+                    Log.d("Jack","Llista Codi:"+position);
                     intent.putParcelableArrayListExtra("ArrayOfertesTreball", arrayOfertesTreballs);
-//                    arrayOfertesTreballs=null;
-//                    intent.putExtra("Activity", "LlistaOfertesActivity.class");
                     startActivity(intent);
                 } else {
-                    Toast.makeText(getApplicationContext(), "No s'ha trobat", Toast.LENGTH_SHORT);
+
+                    MostrarEnpantalla("No s'ha trobat la llista");
 
                 }
             }
         });
 
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final int pos=position;
+                MostrarMenuLlistaOpcions(pos);
+
+                return true;
+            }
+
+        });
+
     }
 
-    private OfertesTreball BuscarOfertesTreball(int num) {
-        //Agafe l'array list del sqlitehelper
-        ArrayList<OfertesTreball> ofertesTreballs = sqLiteHelper.getOfertesTreballs();
-//        Log.d("Jack",""+ofertesTreballs.size());
-        //Faig un objecte null
-        OfertesTreball ot = null;
-        //Recorrec el array de objecte en busca d'un codi
-        for (OfertesTreball ofertesTreball : ofertesTreballs) {
-//            Log.d("Jack",""+ofertesTreball.getCodi()+ofertesTreball.getNom()+ofertesTreball.getDataNotificacio());
-            //Si resulta que el numero es igual al objecte get codi
-            if (num == ofertesTreball.getCodi()) {
-                //Guarda ofertesTreball en un ot y passa a tindre els valors del objecte
-                ot = ofertesTreball;
-                break;
-            }
-        }
-        if (ot != null) {
-//            Log.d("Jack", "trobat");
-            return ot;
+    private void MostrarEnpantalla(String missatge) {
+        Toast.makeText(getApplicationContext(), missatge, Toast.LENGTH_SHORT).show();
+    }
 
-        } else {
-//            Log.d("Jack", "no trobat");
-            return null;
-        }
+    public AlertDialog MostrarMenuLlistaOpcions(int position) {
+
+        final String[] listaElementos =
+                {"Borrar", "Compartir per..."};
+        final int posicio=position;
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this);
+        builder.setTitle("Selecciona el element");
+        builder.setItems(listaElementos,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        switch (item) {
+                            case 0:
+                                MostrarEnpantalla("Opción elegida: " + listaElementos[item]);
+                                OpcioMenuBorrar(posicio);
+                                break;
+                            case 1:
+                                MostrarEnpantalla("Opción elegida: " + listaElementos[item]);
+                                int codi=getCodi(posicio);
+                                OfertesTreball ot=buscarofertaTreball(codi);
+                                if(ot!=null){
+                                    share(ot);
+                                }
+                                break;
+                        }
+                    }
+                });
+        builder.show();
+
+        return builder.create();
+    }
+    private void share(OfertesTreball ot){
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, "Oferta de Treball " + "" + ot.getCodi() + "\n"
+                + " Nom: " + ot.getNom()+"\n"
+                +" Poblacio:"+ot.getPoblacio()+"\n"
+                +" Telefono:"+ot.getTelefono()+"\n"
+                +" E-mail:"+ot.getEmail()+"\n"
+                +" Curs:"+ot.getCicle()+"\n"
+                +" Requisits:"+ot.getDescripcio()+"\n"
+        );
+        startActivity(Intent.createChooser(intent, "Share with"));
+    }
+    private int getCodi(int position){
+        String contingutItem = listView.getItemAtPosition(position).toString();
+        String contingutItemtractat[] = contingutItem.split("\n");
+        String parraf = contingutItemtractat[0];
+        String codill[] = parraf.split(":");
+        return Integer.parseInt(codill[1]);
+    }
+    private void OpcioMenuBorrar(int position){
+        int codi=getCodi(position);
+
+        BorrarOfertaTreball(codi);
+    }
+
+    private void BorrarOfertaTreball(final int codi) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmar");
+        builder.setMessage("Estàs segur de borrar l'informació de la oferta de treball " + codi + "?");
+        builder.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                sqLiteHelper.BorrarRegistre(codi);
+                /*adaptador.remove(adaptador.getItem(proba));
+                adaptador.notifyDataSetChanged();*/
+                Intent intent = getIntent();
+                intent.putExtra("LlistaOfertesActivity", "LlistaOfertesActivity.class");
+
+                intent.putExtra("cb_asix", cb_asix.isChecked());
+                intent.putExtra("cb_dam", cb_dam.isChecked());
+
+                finish();
+                startActivity(intent);
+                MostrarEnpantalla("Has borrado la notificación correspondiente");
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void CondicioArray() {
         if (cb_dam.isChecked() && cb_asix.isChecked()) {
-
             condicio = " WHERE Cicle='DAM+ASIX' ORDER BY Codi DESC;";
 
         } else {
@@ -168,80 +245,34 @@ public class LlistaOfertesActivity extends MenuActivity {
         if (!cb_dam.isChecked() && cb_asix.isChecked()) {
             condicio = " WHERE Cicle='ASIX' ORDER BY Codi DESC;";
         }
-        Log.d("Jack",condicio);
-        llista = sqLiteHelper.cargarArrayList(condicio, llistaOfertes);
+        Log.d("Jack", condicio);
+        llista = sqLiteHelper.cargarArrayListString(condicio);
         CarregarLV();
-        arrayOfertesTreballs=sqLiteHelper.cargarArrayList(condicio);
+        arrayOfertesTreballs = sqLiteHelper.cargarArrayListOfertesTreball(condicio);
     }
-
-  /*  private void CondicioArrayLlistaOfertes() {
-        if (cb_dam.isChecked() && cb_asix.isChecked()) {
-
-            condicio = " WHERE Cicle='DAM+ASIX' ORDER BY Codi DESC;";
-
-        } else {
-            condicio = " ORDER BY Codi DESC;";
-
-        }
-        if (cb_dam.isChecked() && !cb_asix.isChecked()) {
-            condicio = " WHERE Cicle='DAM' ORDER BY Codi DESC;";
-        }
-        if (!cb_dam.isChecked() && cb_asix.isChecked()) {
-            condicio = " WHERE Cicle='ASIX' ORDER BY Codi DESC;";
-        }
-        arrayOfertesTreballs=sqLiteHelper.cargarArrayList(condicio);
-
-
-    }*/
-
 
 
     private void CarregarLV() {
 
         if (llista == null) {
-//            Log.d("Arraylist", "No disposes de elements en la llista");
-            Toast.makeText(getApplicationContext(), "No disposes de registres en la llista", Toast.LENGTH_SHORT).show();
+            MostrarEnpantalla("No disposes de registres en la llista");
             listView.setAdapter(null);
         } else {
             adaptador = new ArrayAdapter(this, android.R.layout.simple_expandable_list_item_1, llista);
             listView.setAdapter(adaptador);
-
         }
     }
-
-/*
-    private void LlegirValorsFirebase() {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference().child("-KjZyP6e8VuvFIYlosQx");
-        databaseReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                String valor = dataSnapshot.getValue(String.class);
-                Log.d("Jack", valor);
+    public OfertesTreball buscarofertaTreball(int codi){
+        OfertesTreball ot=null;
+        for (OfertesTreball ofertesTreball:arrayOfertesTreballs){
+            if(codi==ofertesTreball.getCodi()){
+                ot=ofertesTreball;
+                break;
             }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }
+        return ot;
     }
-*/
+
 
 }
 

@@ -29,10 +29,8 @@ public class MenuActivity extends AppCompatActivity {
         switch (id) {
             case R.id.Inici:
                 intent = new Intent(this, Inici.class);
-                Toast.makeText(getApplicationContext(), "Obrint Inici.class", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.Llista_Ofertes:
-                Toast.makeText(getApplicationContext(), "Obrint LlistaOfertesActivity.class", Toast.LENGTH_SHORT).show();
                 intent = new Intent(this, LlistaOfertesActivity.class);
                 break;
             /*case R.id.Insertar:

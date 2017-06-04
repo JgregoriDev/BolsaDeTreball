@@ -31,6 +31,7 @@ public class Inici extends MenuActivity {
         setContentView(R.layout.activity_inici);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //Si està en segon pla obri envia les dades a SQLite travès de un intent
         if (getIntent().getExtras() != null) {
             String Nom = null;
             String Email = null;
@@ -103,10 +104,9 @@ public class Inici extends MenuActivity {
             }
         }
         if (ot != null) {
-            Log.d("Jack","Estic dins");
             sqLiteHelper=new SQLiteHelper(getApplicationContext());
             sqLiteHelper.Insertar(ot);
-//            startActivity(new Intent(Inici.this, LlistaOfertesActivity.class));
+            startActivity(new Intent(Inici.this, LlistaOfertesActivity.class));
         }
     }
 

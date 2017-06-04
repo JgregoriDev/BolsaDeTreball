@@ -82,7 +82,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 //        InsertarValorsFirebase(ot);
     }
 
-    public ArrayList<String> cargarArrayList(String Condicio, ArrayList<OfertesTreball> lo) {
+    public ArrayList<String> cargarArrayListString(String Condicio) {
         ArrayList<String> llista = new ArrayList<>();
         String sql = "SELECT * FROM " + NomTabla + Condicio;
         SQLiteDatabase db = getWritableDatabase();
@@ -102,10 +102,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 ot.setCodi(codi);
                 ot.setTelefono(Telefono);
                 llista.add(ot.getDataNotificacio()+" Codi:" + ot.getCodi() +""+ "\nNom empresa:" + ot.getNom() + "\nPoblacio:" + ot.getPoblacio());
+/*
                 ofertesTreballs.add(ot);
-                /*llista.add(ot.getCodi() + " " + ot.getNom() + " " + ot.getEmail() + " " + ot.getTelefono() +
+                llista.add(ot.getCodi() + " " + ot.getNom() + " " + ot.getEmail() + " " + ot.getTelefono() +
                         " " + ot.getPoblacio() + " " + ot.getCicle() + " " + ot.getDataNotificacio() +
-                        " " + ot.getDescripcio());*/
+                        " " + ot.getDescripcio());
+*/
 
             } while (c.moveToNext());
         }
@@ -118,8 +120,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             return llista;
         }
     }
-    public ArrayList<OfertesTreball> cargarArrayList(String Condicio) {
-//        ArrayList<String> llista = new ArrayList<>();
+    public ArrayList<OfertesTreball> cargarArrayListOfertesTreball(String Condicio) {
         ofertesTreballs=null;
         String sql = "SELECT * FROM " + NomTabla + Condicio;
         SQLiteDatabase db = getWritableDatabase();
@@ -140,12 +141,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 ot.setTelefono(Telefono);
 //                llista.add(ot.getDataNotificacio()+" Codi:" + ot.getCodi() +""+ "\nNom empresa:" + ot.getNom() + "\nPoblacio:" + ot.getPoblacio());
                 ofertesTreballs.add(ot);
-                ofertesTreballs.size();
+
                 /*llista.add(ot.getCodi() + " " + ot.getNom() + " " + ot.getEmail() + " " + ot.getTelefono() +
                         " " + ot.getPoblacio() + " " + ot.getCicle() + " " + ot.getDataNotificacio() +
                         " " + ot.getDescripcio());*/
-
             } while (c.moveToNext());
+            db.close();
         }
         if (ofertesTreballs.isEmpty()) {
             Log.d("Jack", "Llista esta buit");
@@ -215,7 +216,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String sql = "DELETE FROM " + NomTabla + " WHERE " + Codi + "='" + codi+ "';";
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL(sql);
-        Log.d("Jack","Registre borrat");
+//        Log.d("Jack","Registre borrat");
         ofertesTreballs=null;
     }
     public ArrayList<OfertesTreball> getOfertesTreballs() {

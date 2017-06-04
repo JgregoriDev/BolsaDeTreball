@@ -66,7 +66,6 @@ public class MyAndroidFirebaseMsgService extends FirebaseMessagingService {
         if(ot!=null){
             sqLiteHelper.Insertar(ot);
 
-
         }
         campsMissatge = new ArrayMap<>();
         campsMissatge = (ArrayMap<String, String>) remoteMessage.getData();
